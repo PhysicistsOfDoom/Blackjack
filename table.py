@@ -54,8 +54,8 @@ class Dealer(Player):
         self.wins = 0
 
     def must_hit(self, cards):
-        self.recieve_card(cards)
-        return self.calculate_score() < 17
+        while self.calculate_score() < 17:
+            self.recieve_card(cards)
     
     def show_card(self):
         return self.hand

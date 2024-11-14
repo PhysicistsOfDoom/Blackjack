@@ -6,12 +6,13 @@ from table import Deck, Dealer, Player
 """
 
 def main():
-    #Begin Game (Y/N)
-    begin = input("Want to begin? (Y/N)")
+
+    #Start the game:
+    begin = input("Start? (Y/N)")
     if begin.lower() == "y":
         running = True
-        hit_stand_loop = True
     else:
+        running = False
         exit()
 
     #Initialize Players, Dealer & Deck
@@ -21,6 +22,30 @@ def main():
     
     #Game Loop
     while running:
+
+        #Menu Screen
+        in_menu = True
+        while in_menu:
+            print("\nMenu:")
+            menu_choices = int(input("""
+            1. Play Blackjack
+            2. Check Player Wins
+            3. Check Dealer Wins
+            4. Exit
+            """))
+
+            if menu_choices == 1:
+                in_menu = False
+                break
+            elif menu_choices == 2:
+                print(f"Player Wins: {player.wins}")
+            elif menu_choices == 3:
+                print(f"Dealer Wins: {dealer.wins}")
+            else:
+                print(f"\n Thanks for Playing!")
+                running = False
+                exit()
+
         #Reset players hands:
         player.reset_hand()
         dealer.reset_hand()
@@ -30,56 +55,73 @@ def main():
             player.recieve_card(deck.deal_cards())
             dealer.recieve_card(deck.deal_cards())
 
-        #Show cards to table
+        #Show initial cards & scores to table
         print(f'Player: {player.hand}\n Player Score: {player.calculate_score()}' )
         print(f'Dealer: {dealer.hand}\n Dealer Score: {dealer.calculate_score()}\n')
 
         #Check if either got a Blackjack on first go.
-        if player.hand == 21:
+        if player.calculate_score() == 21:
             print("Player got a Blackjack! Player wins!")
             player.wins += 1
-        elif dealer.hand == 21:
+            running = False
+            continue
+        elif dealer.calculate_score() == 21:
             print("Dealer got a Blackjack! Dealer wins!")
             dealer.wins += 1
+            running = False
+            continue
 
 
         #Start the hit or stand loop until someone either blacjacks, wins, loses or busts > 21.
+        hit_stand_loop = True
         while hit_stand_loop:        
-            #Ask to Hit or Stand. If hit, give player a new card
+            #Ask to Hit or Stand
             player_decision = input("Hit or Stand? (Y/N)")
 
-            # If the player chooses HIT, then run and calculate
+            #Player Hits
             if player_decision.lower() == "y":
-
                 player.recieve_card(deck.deal_cards())
-                #Bust calculation
+
+
+                #Check If Player Busts.
                 if player.calculate_score() > 21:
                     print(f'\nPlayer: {player.hand}\n Player Score: {player.calculate_score()}')
                     print(f'Dealer: {dealer.hand}\n Dealer Score: {dealer.calculate_score()}')
                     print("\n BUST! Dealer Wins!")
                     dealer.wins += 1
-                    hit_stand_loop = False
+                    hit_stand_loop = False #Stop The Hit Loop
+
+                #No Bust.
                 else:
+                    #Display Updated Scores.
                     print(f'Player: {player.hand}\n Player Score: {player.calculate_score()}')
                     print(f'Dealer: {dealer.hand}\n Dealer Score: {dealer.calculate_score()}')
 
-            # If the player chooses no, run the dealers turn
-            if player_decision.lower() == "n":
 
-                #Automatically hit for dealer if score is less than 17
-                dealer.must_hit(deck.deal_cards())
+            #Player Stands.
+            elif player_decision.lower() == "n":  
+                #Dealer Hits While Score < 17.
+                while dealer.calculate_score() < 17:
+                    dealer.recieve_card(deck.deal_cards())
 
-                #Check if the dealer went over 21.
+                #Show Final Scores
+                print(f'\nPlayer: {player.hand}\n Player Score: {player.calculate_score()}')
+                print(f'Dealer: {dealer.hand}\n Dealer Score: {dealer.calculate_score()}')
+
+                #Determine The Winner
                 if dealer.calculate_score() > 21:
-                    print(f'Player: {player.hand}\n Player Score: {player.calculate_score()}')
-                    print(f'Dealer: {dealer.hand}\n Dealer Score: {dealer.calculate_score()}')
-                    print("\n BUST! Player Wins!")
+                    print("\nBUST! Player Wins!")
                     player.wins += 1
-                    hit_stand_loop = False
-                hit_stand_loop = False
-
-
-        running = False
+                elif dealer.calculate_score() > player.calculate_score():
+                    print("\nDealer Wins!")
+                    dealer.wins += 1
+                elif dealer.calculate_score() < player.calculate_score():
+                    print("\nPlayer Wins!")
+                    player.wins += 1
+                else:
+                    print("\nIt's a Tie!")
+                
+                hit_stand_loop = False  #End the hit/stand loop
 
 
 if __name__ == "__main__":
