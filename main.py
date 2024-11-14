@@ -9,6 +9,7 @@ Welcome to Blacjack built in pygame, this is a less functional but still playabl
 
 Date: 11/14/2024
 By: Corbin Thomas Beus
+Github: PhysicistsOfDoom
 """
 
 def main():

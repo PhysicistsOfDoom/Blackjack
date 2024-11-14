@@ -60,5 +60,3 @@ class Dealer(Player):
     def show_card(self):
         return self.hand
     
-    def compare_score(self):
-        pass
