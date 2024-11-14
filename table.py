@@ -22,6 +22,7 @@ class Player(Deck):
         self.name = name
         self.hand = []
         self.score = 0
+        self.wins = 0
 
     #Method to recieve a card
     def recieve_card(self, card):
@@ -29,6 +30,9 @@ class Player(Deck):
 
     def show_card(self):
         return self.hand
+    
+    def reset_hand(self):
+        self.hand = []
 
 
     #Method to calculate scores according to card
@@ -47,6 +51,7 @@ class Player(Deck):
 class Dealer(Player):
     def __init__(self):
         super().__init__(name="dealer") #Inherit all the essentials from Player
+        self.wins = 0
 
     def must_hit(self, cards):
         self.recieve_card(cards)
@@ -54,3 +59,6 @@ class Dealer(Player):
     
     def show_card(self):
         return self.hand
+    
+    def compare_score(self):
+        pass

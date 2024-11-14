@@ -1,5 +1,15 @@
 import pygame
 from sys import exit
+import game, table
+"""
+Welcome to Blacjack built in pygame, this is a less functional but still playable game of blacjack
+- Other modules connected like game.py handle the functionality and rules.
+- table.py holds the players hands, handles the decks leftovers and the dealers actions
+- This module holds the pygame U.I to establish a better experience
+
+Date: 11/14/2024
+By: Corbin Thomas Beus
+"""
 
 def main():
     #Initializer, Display, Caption, Clock
