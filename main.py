@@ -8,7 +8,6 @@ Welcome to Blacjack built in pygame, this is a less functional but still playabl
 - This module holds the pygame U.I to establish a better experience
 
 Date: 11/14/2024
-By: Corbin Thomas Beus
 Github: PhysicistsOfDoom
 """
 
