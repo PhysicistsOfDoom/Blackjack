@@ -123,6 +123,5 @@ def main():
                 
                 hit_stand_loop = False  #End the hit/stand loop
 
-
 if __name__ == "__main__":
     main()
