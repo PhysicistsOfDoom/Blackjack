@@ -1,8 +1,8 @@
 from sys import exit
-from table import Deck, Dealer, Player
+from logic import Deck, Dealer, Player
 """
 - This module is where we handle all the functionalities in the U.I, pygame will handle the visuals
-- We will use the classes from the table module to handle the game logic
+- We will use the classes from the logic module to handle the game logic
 """
 
 def main():
@@ -32,7 +32,7 @@ def main():
             2. Check Player Wins
             3. Check Dealer Wins
             4. Exit
-            """))
+            User@Blackjack~: """))
 
             if menu_choices == 1:
                 in_menu = False
@@ -71,17 +71,27 @@ def main():
             running = False
             continue
 
+        #Check if either bust over 21
+        if player.calculate_score() > 21:
+            print("Player busts! Dealer wins!")
+            dealer.wins += 1
+            running = False
+            continue
+        elif dealer.calculate_score() > 21:
+            print("Dealer busts! Player wins!")
+            player.wins += 1
+            running = False
+            continue
 
         #Start the hit or stand loop until someone either blacjacks, wins, loses or busts > 21.
         hit_stand_loop = True
         while hit_stand_loop:        
             #Ask to Hit or Stand
-            player_decision = input("Hit or Stand? (Y/N)")
+            player_decision = input("Hit or Stand? (Y/N): ")
 
             #Player Hits
             if player_decision.lower() == "y":
                 player.recieve_card(deck.deal_cards())
-
 
                 #Check If Player Busts.
                 if player.calculate_score() > 21:
