@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 from sys import exit
 from logic import *
+import time
 """
 Welcome to Blacjack built in pygame, this is a less functional but still playable game of blacjack
 - Other modules connected like game.py handle the functionality and rules.
@@ -36,16 +37,16 @@ def main():
     #Final position (x,y)
     start_button.center = (400,200)
 
-    quit_button = pygame.Rect(0,0, 300, 200)
+    quit_button = pygame.Rect(0,0, 300, 200) #Quit Button
     quit_button.center = (400,600)
 
-    return_button = pygame.Rect(0,0, 100, 50)
+    return_button = pygame.Rect(0,0, 100, 50) #Return to Menu Button
     return_button.center = (75,50)
 
-    hit_button = pygame.Rect(0,0, 100, 50)
+    hit_button = pygame.Rect(0,0, 100, 50) #Hit Button
     hit_button.center = (75,700)
 
-    stand_button = pygame.Rect(0,0, 100, 50)
+    stand_button = pygame.Rect(0,0, 100, 50) #Stand Button
     stand_button.center = (725,700)
 
     #Colors
@@ -81,8 +82,6 @@ def main():
 
     #Play
     def play():
-        #Play Background Color
-        screen.fill((0,100,50))
         
         #Return Button
         pygame.draw.rect(screen, WHITE, return_button)
@@ -110,13 +109,13 @@ def main():
     #Run Loop
     running = True
 
+    #Intialize Values First
+    player = Player()
+    dealer = Dealer()
+    deck = Deck() #List of tuples of random cards
+
     #Game Loop
     while running:
-
-        #Intialize Values First
-        player = Player()
-        dealer = Dealer()
-        deck = Deck() #List of tuples of random cards
 
         #Event Handle
         for event in pygame.event.get():
@@ -131,46 +130,62 @@ def main():
                     if start_button.collidepoint(event.pos):
                         #Initialize Players, Dealer & Deck
                         game_state = "play" #Start
+                        #Setup Game
+                        screen.fill((0,100,50))
+                        player.reset_hand()
+                        dealer.reset_hand()
+                        deck.reset_deck() #Reset deck so we don't run out of cards.
+
+                        #Deal cards to player and dealer
+                        for _ in range(2):
+                            player.recieve_card(deck.deal_cards())
+                            dealer.recieve_card(deck.deal_cards())
 
                     elif quit_button.collidepoint(event.pos):
                         running = False
-
                 elif game_state == "play":
                     if return_button.collidepoint(event.pos):
                         game_state = "menu"
 
         #Game Mechanics
-        player.reset_hand()
-        dealer.reset_hand()
+        if game_state == "play": #Check Game state so we don't waste computation.
 
-        #Deal cards to player and dealer
-        for _ in range(2):
-            player.recieve_card(deck.deal_cards())
-            dealer.recieve_card(deck.deal_cards())
+            #Show Cards     
+            player_cards = ", ".join([f"{rank}{suit}" for rank, suit in player.hand])
+            font = pygame.font.Font(None, 36)
+            player_card_surface = font.render(player_cards, True, (255,255,255))
+            player_card_rect = player_card_surface.get_rect(center=(200,150))
+            screen.blit(player_card_surface, player_card_rect)
 
-        #Check if either got a Blackjack on first go.
-        if player.calculate_score() == 21:
-            print("Player got a Blackjack! Player wins!")
-            player.wins += 1
-            running = False
-            continue
-        elif dealer.calculate_score() == 21:
-            print("Dealer got a Blackjack! Dealer wins!")
-            dealer.wins += 1
-            running = False
-            continue
+            #Check if either got a Blackjack on first go.
+            if player.calculate_score() == 21:
+                print("Player got a Blackjack! Player wins!")
+                player.wins += 1
+                player.reset_hand()
+                dealer.reset_hand()
+                time.sleep(1)
+                continue
+            elif dealer.calculate_score() == 21:
+                print("Dealer got a Blackjack! Dealer wins!")
+                dealer.wins += 1
+                player.reset_hand()
+                dealer.reset_hand()
+                time.sleep(1)
+                continue
 
-        #Check if either bust over 21
-        if player.calculate_score() > 21:
-            print("Player busts! Dealer wins!")
-            dealer.wins += 1
-            running = False
-            continue
-        elif dealer.calculate_score() > 21:
-            print("Dealer busts! Player wins!")
-            player.wins += 1
-            running = False
-            continue
+            #Check if either bust over 21
+            if player.calculate_score() > 21:
+                print("Player busts! Dealer wins!")
+                dealer.wins += 1
+                player.reset_hand()
+                dealer.reset_hand()
+                continue
+            elif dealer.calculate_score() > 21:
+                print("Dealer busts! Player wins!")
+                player.wins += 1
+                player.reset_hand()
+                dealer.reset_hand()
+                continue
 
 
 

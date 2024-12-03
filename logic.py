@@ -18,6 +18,11 @@ class Deck:
 
     def deal_cards(self):
         return self.deck.pop()
+    
+    #reset the deck so we dont run out of cards during the loop.
+    def reset_deck(self):
+        self.__init__()
+
 
 class Player(Deck):
     def __init__(self, name="player"):
