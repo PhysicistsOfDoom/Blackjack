@@ -1,5 +1,9 @@
 from sys import exit
 import random
+import time
+import pygame
+from pygame.locals import *
+
 
 """
 - This module is where we hold the Deck for shuffling and managing used cards.
@@ -9,6 +13,7 @@ import random
 
 #PNG to BlackJack Cards
 
+#Classes
 class Deck:
     def __init__(self):
         self.rank = [1, 2, 3, 4, 5, 6, 7, 8, 9 , 10, "J", "K", "Q", "A"]
@@ -64,3 +69,58 @@ class Dealer(Player):
     
     def show_card(self):
         return self.hand
+
+#Functions
+def show_player_cards(player, screen):
+    player_cards = ", ".join([f"{rank}{suit}" for rank, suit in player.hand])
+    font = pygame.font.Font(None, 36)
+    player_card_surface = font.render(player_cards, True, (255,255,255))
+    player_card_rect = player_card_surface.get_rect(center=(200,600))
+    screen.blit(player_card_surface, player_card_rect)
+
+#Show Dealer Cards
+def show_dealer_cards(dealer, screen):
+    dealer_cards = ", ".join([f"{rank}{suit}" for rank, suit in dealer.hand])
+    font = pygame.font.Font(None, 36)
+    dealer_cards_surface = font.render(dealer_cards, True, (255,255,255))
+    dealer_cards_rect = dealer_cards_surface.get_rect(center=(200,200))
+    screen.blit(dealer_cards_surface, dealer_cards_rect)
+
+#Compare score per hit/stand
+def compare_score(player, dealer):
+    if player.calculate_score() == 21:
+        print("Player got a Blackjack! Player wins!")
+        player.wins += 1
+        player.reset_hand()
+        dealer.reset_hand()
+        time.sleep(1)
+
+    elif dealer.calculate_score() == 21:
+        print("Dealer got a Blackjack! Dealer wins!")
+        dealer.wins += 1
+        player.reset_hand()
+        dealer.reset_hand()
+        time.sleep(1)
+
+    #Check if either bust over 21
+    if player.calculate_score() > 21:
+        print("Player busts! Dealer wins!")
+        dealer.wins += 1
+        player.reset_hand()
+        dealer.reset_hand()
+
+    elif dealer.calculate_score() > 21:
+        print("Dealer busts! Player wins!")
+        player.wins += 1
+        player.reset_hand()
+        dealer.reset_hand()
+
+def handle_menu(event, player, dealer, deck, quit_button, start_button):
+    if start_button.collidepoint(event.pos):
+        # Initialize the game
+        player.reset_hand()
+        dealer.reset_hand()
+        deck.reset_deck()
+        for _ in range(2):
+            player.recieve_card(deck.deal_cards())
+            dealer.recieve_card(deck.deal_cards())

@@ -108,6 +108,7 @@ def main():
 
     #Run Loop
     running = True
+    hit_stand_loop = True
 
     #Intialize Values First
     player = Player()
@@ -132,14 +133,7 @@ def main():
                         game_state = "play" #Start
                         #Setup Game
                         screen.fill((0,100,50))
-                        player.reset_hand()
-                        dealer.reset_hand()
-                        deck.reset_deck() #Reset deck so we don't run out of cards.
-
-                        #Deal cards to player and dealer
-                        for _ in range(2):
-                            player.recieve_card(deck.deal_cards())
-                            dealer.recieve_card(deck.deal_cards())
+                        handle_menu(event, player, dealer, deck, quit_button, start_button)
 
                     elif quit_button.collidepoint(event.pos):
                         running = False
@@ -150,42 +144,27 @@ def main():
         #Game Mechanics
         if game_state == "play": #Check Game state so we don't waste computation.
 
-            #Show Cards     
-            player_cards = ", ".join([f"{rank}{suit}" for rank, suit in player.hand])
-            font = pygame.font.Font(None, 36)
-            player_card_surface = font.render(player_cards, True, (255,255,255))
-            player_card_rect = player_card_surface.get_rect(center=(200,150))
-            screen.blit(player_card_surface, player_card_rect)
+            #Show Player Cards     
+            show_player_cards(player, screen)
+
+            #Show Dealer Cards     
+            show_dealer_cards(dealer, screen)
 
             #Check if either got a Blackjack on first go.
-            if player.calculate_score() == 21:
-                print("Player got a Blackjack! Player wins!")
-                player.wins += 1
-                player.reset_hand()
-                dealer.reset_hand()
-                time.sleep(1)
-                continue
-            elif dealer.calculate_score() == 21:
-                print("Dealer got a Blackjack! Dealer wins!")
-                dealer.wins += 1
-                player.reset_hand()
-                dealer.reset_hand()
-                time.sleep(1)
-                continue
+            compare_score(player, dealer)
 
-            #Check if either bust over 21
-            if player.calculate_score() > 21:
-                print("Player busts! Dealer wins!")
-                dealer.wins += 1
-                player.reset_hand()
-                dealer.reset_hand()
-                continue
-            elif dealer.calculate_score() > 21:
-                print("Dealer busts! Player wins!")
-                player.wins += 1
-                player.reset_hand()
-                dealer.reset_hand()
-                continue
+            #Check for Hit/Stand clicks
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if hit_button.collidepoint(event.pos):
+                        player.recieve_card(deck.deal_cards())
+                        show_player_cards(player, screen)
+                        compare_score(player,dealer)
+
+                    elif stand_button.collidepoint(event.pos):
+                        dealer.recieve_card(deck.deal_cards())
+                        compare_score(player,dealer)
+                    
 
 
 
