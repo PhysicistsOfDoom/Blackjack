@@ -25,6 +25,7 @@ def main():
     screen.fill((1,50,32))
 
     #Caption & Icon
+    font = pygame.font.Font(None, 36)
     icon = pygame.image.load("./media/UVU.png")
     pygame.display.set_icon(icon)
     pygame.display.set_caption("UVU Blackjack")
@@ -32,47 +33,37 @@ def main():
     #clock
     clock = pygame.time.Clock()
 
-    #Buttons (initial position, width, height)
-    start_button = pygame.Rect(0,0, 300, 200)
-    #Final position (x,y)
-    start_button.center = (400,200)
-
-    quit_button = pygame.Rect(0,0, 300, 200) #Quit Button
-    quit_button.center = (400,600)
-
-    return_button = pygame.Rect(0,0, 100, 50) #Return to Menu Button
-    return_button.center = (75,50)
-
-    hit_button = pygame.Rect(0,0, 100, 50) #Hit Button
-    hit_button.center = (75,700)
-
-    stand_button = pygame.Rect(0,0, 100, 50) #Stand Button
-    stand_button.center = (725,700)
-
     #Colors
     BLACK = (0,0,0)
     GREEN = (0,255,0)
     RED = (255,0,0)
     WHITE = (255,255,255)
 
-    #Game state
-    game_state = "menu"
-
     #Menu
-    def menu():
-        #Menu Background Color
-        screen.fill((1,50,32))
+    def draw_menu():
+        #Fill color screen
+        screen.fill((BLACK))
+
+        #Buttons to return
+        buttons_list = []
+
+        #Buttons (initial position, width, height)
+        start_button = pygame.Rect(0,0, 300, 200) #Start Button
+        start_button.center = (400,200)
+        quit_button = pygame.Rect(0,0, 300, 200) #Quit Button
+        quit_button.center = (400,600)
+        buttons_list.append(start_button) #0
+        buttons_list.append(quit_button) #1
+        
         
         #Draw To Screen
         pygame.draw.rect(screen, WHITE, start_button)
         pygame.draw.rect(screen, WHITE, quit_button)
+        pygame.draw.rect(screen, "green", [245,95, 310, 210], 3, 5)
 
         #Text
-        font = pygame.font.Font(None, 36)
         start_text = font.render("Play BlackJack", True, BLACK)
         quit_text = font.render("Quit Game", True, BLACK)
-
-        #Text alignment
         start_text_rect = start_text.get_rect(center=start_button.center)
         quit_text_rect = quit_text.get_rect(center=quit_button.center)
 
@@ -80,35 +71,55 @@ def main():
         screen.blit(start_text, start_text_rect)
         screen.blit(quit_text, quit_text_rect)
 
+        return buttons_list
+
     #Play
-    def play():
+    def draw_game():
+        #Color Screen
+        screen.fill((1,50,32))
+
+        #Button List for Outside Use
+        button_list = []
+
+        #Buttons
+        return_button = pygame.Rect(0,0, 100, 50) #Return to Menu Button
+        return_button.center = (75,50)
+        hit_button = pygame.Rect(0,0, 100, 50) #Hit Button
+        hit_button.center = (75,700)
+        stand_button = pygame.Rect(0,0, 100, 50) #Stand Button
+        stand_button.center = (725,700)
+        button_list.append(hit_button) #0
+        button_list.append(stand_button) #1
+        button_list.append(return_button) #2
         
         #Return Button
         pygame.draw.rect(screen, WHITE, return_button)
-        font = pygame.font.Font(None, 20)
-        return_text = font.render("Return to Menu", True, BLACK)
+        return_text = font.render("Menu", True, BLACK)
         return_text_rect = return_text.get_rect(center=return_button.center)
         screen.blit(return_text, return_text_rect)
 
         #Hit Button
         pygame.draw.rect(screen, WHITE, hit_button)
-        font = pygame.font.Font(None, 30)
         hit_text = font.render("HIT!", True, BLACK)
         hit_text_rect = hit_text.get_rect(center=hit_button.center)
         screen.blit(hit_text, hit_text_rect)
 
         #Stand Button
         pygame.draw.rect(screen, WHITE, stand_button)
-        font = pygame.font.Font(None, 30)
         stand_text = font.render("STAND!", True, BLACK)
         stand_text_rect = stand_text.get_rect(center=stand_button.center)
         screen.blit(stand_text, stand_text_rect)
+
+        return button_list
 
     '--------------------------------------------------Game Loop Code------------------------------------------------'
 
     #Run Loop
     running = True
     hit_stand_loop = True
+
+    #Game state
+    in_game = False
 
     #Intialize Values First
     player = Player()
@@ -118,6 +129,14 @@ def main():
     #Game Loop
     while running:
 
+        #FPS, Updating Display & Draw
+        clock.tick(60)
+        #Draw Whatever is Active
+        if not in_game:
+            menu_buttons = draw_menu() #[Start, Quit]
+        if in_game:
+            game_buttons = draw_game() #[Hit, Stand, Return]
+        
         #Event Handle
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -127,59 +146,21 @@ def main():
 
             #Menu & Play Screen Mechanics
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if game_state == "menu":
-                    if start_button.collidepoint(event.pos):
+                if not in_game:
+                    if menu_buttons[0].collidepoint(event.pos):
                         #Initialize Players, Dealer & Deck
-                        game_state = "play" #Start
+                        in_game = True
                         #Setup Game
-                        screen.fill((0,100,50))
-                        handle_menu(event, player, dealer, deck, quit_button, start_button)
+                        handle_menu(event, player, dealer, deck)
 
-                    elif quit_button.collidepoint(event.pos):
+                    elif menu_buttons[1].collidepoint(event.pos):
                         running = False
-                elif game_state == "play":
-                    if return_button.collidepoint(event.pos):
-                        game_state = "menu"
+                elif in_game:
+                    if game_buttons[2].collidepoint(event.pos):
+                        in_game = False
 
-        #Game Mechanics
-        if game_state == "play": #Check Game state so we don't waste computation.
-
-            #Show Player Cards     
-            show_player_cards(player, screen)
-
-            #Show Dealer Cards     
-            show_dealer_cards(dealer, screen)
-
-            #Check if either got a Blackjack on first go.
-            compare_score(player, dealer)
-
-            #Check for Hit/Stand clicks
-            for event in pygame.event.get():
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if hit_button.collidepoint(event.pos):
-                        player.recieve_card(deck.deal_cards())
-                        show_player_cards(player, screen)
-                        compare_score(player,dealer)
-
-                    elif stand_button.collidepoint(event.pos):
-                        dealer.recieve_card(deck.deal_cards())
-                        compare_score(player,dealer)
-                    
-
-
-
-
-
-        #Check Game state
-        if game_state == "menu":
-            menu()
-        if game_state == "play":
-            play()
-
-
-        #Display & Clock 60 fps
+        #Update Screen
         pygame.display.update()
-        clock.tick(60)
 
 if __name__ == "__main__":
     main()

@@ -18,8 +18,9 @@ class Deck:
     def __init__(self):
         self.rank = [1, 2, 3, 4, 5, 6, 7, 8, 9 , 10, "J", "K", "Q", "A"]
         self.suit = ["♣", "♦", "♥", "♠"]
-        self.deck = [(r,s) for r in self.rank for s in self.suit]
-        random.shuffle(self.deck) #This just shuffles the entire deck
+        self.original_deck = [(r,s) for r in self.rank for s in self.suit]
+        random.shuffle(self.original_deck) #This just shuffles the entire deck
+        self.deck = self.original_deck[:] * 4 #Make a Copy & Multiply it by 4 so we have 4 Decks to avoid Card Loss
 
     def deal_cards(self):
         return self.deck.pop()
@@ -91,32 +92,22 @@ def compare_score(player, dealer):
     if player.calculate_score() == 21:
         print("Player got a Blackjack! Player wins!")
         player.wins += 1
-        player.reset_hand()
-        dealer.reset_hand()
-        time.sleep(1)
 
     elif dealer.calculate_score() == 21:
         print("Dealer got a Blackjack! Dealer wins!")
         dealer.wins += 1
-        player.reset_hand()
-        dealer.reset_hand()
-        time.sleep(1)
 
     #Check if either bust over 21
     if player.calculate_score() > 21:
         print("Player busts! Dealer wins!")
         dealer.wins += 1
-        player.reset_hand()
-        dealer.reset_hand()
 
     elif dealer.calculate_score() > 21:
         print("Dealer busts! Player wins!")
         player.wins += 1
-        player.reset_hand()
-        dealer.reset_hand()
 
-def handle_menu(event, player, dealer, deck, quit_button, start_button):
-    if start_button.collidepoint(event.pos):
+
+def handle_menu(event, player, dealer, deck):
         # Initialize the game
         player.reset_hand()
         dealer.reset_hand()
