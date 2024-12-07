@@ -16,7 +16,7 @@ from pygame.locals import *
 #Classes
 class Deck:
     def __init__(self):
-        self.rank = [1, 2, 3, 4, 5, 6, 7, 8, 9 , 10, "J", "K", "Q", "A"]
+        self.rank = [2, 3, 4, 5, 6, 7, 8, 9 , 10, "J", "K", "Q", "A"]
         self.suit = ["♣", "♦", "♥", "♠"]
         self.original_deck = [(r,s) for r in self.rank for s in self.suit]
         random.shuffle(self.original_deck) #This just shuffles the entire deck

@@ -4,6 +4,7 @@ from sys import exit
 from logic import *
 from ui import *
 import time
+from cards import cards_to_paths
 """
 Welcome to Blacjack built in pygame, this is a less functional but still playable game of blacjack
 - Other modules connected like game.py handle the functionality and rules.
@@ -70,14 +71,16 @@ def main():
                 print(dealer.hand)
 
                 #Display cards
-                text = str(player.hand)
-                text_surface = font.render(text, True, BLACK)
-                
+                card = player.hand[0] #pick a card
+                file_path = cards_to_paths[card] #this gets the file path of the card
+                card_image = pygame.transform.scale(pygame.image.load(file_path), (150, 200)) # (Image Surface, Size) #load the card image
+
+
                 #Finish Dealing Cards
                 dealed_cards = True
         
             if hit_stand_loop:
-                screen.blit(text_surface, (200,200))
+                screen.blit(card_image, (200,200))
 
 
         #Event Handle
