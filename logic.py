@@ -11,7 +11,7 @@ from pygame.locals import *
 - Dealing the players and managing the Dealers hand.
 """
 
-#PNG to BlackJack Cards
+
 
 #Classes
 class Deck:
@@ -115,3 +115,15 @@ def handle_menu(event, player, dealer, deck):
         for _ in range(2):
             player.recieve_card(deck.deal_cards())
             dealer.recieve_card(deck.deal_cards())
+
+#Deal First Cards
+def deal_first_cards(player, dealer, deck):
+    #reset
+    player.reset_hand() 
+    dealer.reset_hand()
+
+    #Give players Their cards
+    player.recieve_card(deck.deal_cards()) 
+    player.recieve_card(deck.deal_cards()) 
+    dealer.recieve_card(deck.deal_cards()) 
+    dealer.recieve_card(deck.deal_cards()) 
