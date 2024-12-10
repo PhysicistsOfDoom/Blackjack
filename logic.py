@@ -117,7 +117,7 @@ def handle_menu(event, player, dealer, deck):
             dealer.recieve_card(deck.deal_cards())
 
 #Deal First Cards
-def deal_first_cards(player, dealer, deck):
+def deal_first_cards(player, dealer, deck, cards_to_paths):
     #reset
     player.reset_hand() 
     dealer.reset_hand()
@@ -127,3 +127,23 @@ def deal_first_cards(player, dealer, deck):
     player.recieve_card(deck.deal_cards()) 
     dealer.recieve_card(deck.deal_cards()) 
     dealer.recieve_card(deck.deal_cards()) 
+
+        #Get each card from hand
+    player_card_1 = player.hand[0] #pick a card
+    player_card_2 = player.hand[1] #pick a card
+    dealer_card_1 = dealer.hand[0] #pick a card
+    dealer_card_2 = dealer.hand[1] #pick a card
+
+    #Get each cards filepath
+    player1_file_path = cards_to_paths[player_card_1] #this gets the file path of the card
+    player2_file_path = cards_to_paths[player_card_2] #this gets the file path of the card
+    dealer1_file_path = cards_to_paths[dealer_card_1] #this gets the file path of the card
+    dealer2_file_path = cards_to_paths[dealer_card_2] #this gets the file path of the card
+
+    #Generate image for cards
+    player1_card_image = pygame.transform.scale(pygame.image.load(player1_file_path), (150, 200)) # (Image Surface, Size) #load the card image
+    player2_card_image = pygame.transform.scale(pygame.image.load(player2_file_path), (150, 200)) # (Image Surface, Size) #load the card image
+    dealer1_card_image = pygame.transform.scale(pygame.image.load(dealer1_file_path), (150, 200)) # (Image Surface, Size) #load the card image
+    dealer2_card_image = pygame.transform.scale(pygame.image.load(dealer2_file_path), (150, 200)) # (Image Surface, Size) #load the card image
+
+    return player1_card_image, player2_card_image, dealer1_card_image, dealer2_card_image
